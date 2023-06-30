@@ -2,6 +2,8 @@ const express = require('express');
 const mysql = require('mysql2');
 const joi = require('joi');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const { authenticate } = require('./middleware');
 require('dotenv').config();
 
 const server = express();
@@ -26,8 +28,9 @@ const userLoginSchema = joi.object({
 
 const dbPool = mysql.createPool(mysqlConfig).promise();
 
-server.get('/', (_, res) => {
-  res.status(200).end();
+server.get('/', authenticate, (req, res) => {
+  console.log(req.user);
+  res.status(200).send({ message: 'Authorized' });
 });
 
 server.post('/login', async (req, res) => {
@@ -52,7 +55,14 @@ server.post('/login', async (req, res) => {
     );
 
     if (isPasswordMatching) {
-      return res.status(200).end();
+      const token = jwt.sign(
+        {
+          email: data[0].email,
+          id: data[0].id,
+        },
+        'abc123'
+      );
+      return res.status(200).send({ token });
     }
 
     return res.status(400).send({ error: 'Email or password did not match' });
