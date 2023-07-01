@@ -1,0 +1,118 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+}
+
+main {
+  background-image: url(./img/bg.webp);
+  min-height: 100vh;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+main .login-card {
+  width: 500px;
+  background-color: rgba(255, 255, 255, 0.736);
+  border-radius: 8px;
+  padding: 64px 32px 48px;
+  margin: 2rem 02rem 0;
+}
+
+main .login-card h1 {
+  text-align: center;
+  margin-bottom: 64px;
+  font-weight: bold;
+}
+
+input:focus {
+  outline: none;
+}
+
+/* FORM */
+
+main .login-card form input {
+  display: block;
+  width: 100%;
+  border: none;
+  border-bottom: 2px solid lightgray;
+  padding: 16px;
+  font-size: 16px;
+  border-radius: 8px;
+}
+
+main .login-card form input {
+  margin-bottom: 24px;
+}
+
+main .login-card form label {
+  font-size: 14px;
+  margin-left: 4px;
+}
+
+main .login-card form .link-container {
+  margin-top: 16px;
+  text-align: right;
+  margin-bottom: 32px;
+}
+
+main .login-card form a {
+  text-decoration: none;
+  color: grey;
+  font-size: 14px;
+}
+
+main .login-card form a:hover {
+  color: purple;
+}
+
+main .login-card form button {
+  width: 100%;
+  margin-top: 32px;
+  padding: 16px 0;
+  border-radius: 25px;
+  cursor: pointer;
+  border: none;
+  background: -webkit-linear-gradient(left, #526b69, #e7cbc2);
+  color: white;
+  font-size: 15px;
+  font-weight: bold;
+  transition-delay: 1s;
+  transition-property: background;
+}
+
+main .login-card form button:hover {
+  background: -webkit-linear-gradient(left, #e7cbc2, #526b69);
+}
+/* ===================================================== */
+
+/* Sign up */
+
+main .login-card .span-container {
+  text-align: center;
+  margin: 48px 0 32px;
+}
+
+.container {
+  padding: 3rem;
+}
+.container h1 {
+  margin-bottom: 1rem;
+}
+
+.tweet {
+  padding: 1rem 2rem;
+  box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 24px 0px,
+    rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
+  margin-bottom: 1rem;
+}
+
+.tweet h4 {
+  margin-bottom: 0.5rem;
+}

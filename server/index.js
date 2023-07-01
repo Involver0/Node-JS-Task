@@ -3,11 +3,13 @@ const mysql = require('mysql2');
 const joi = require('joi');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const cors = require('cors');
 const { authenticate } = require('./middleware');
 require('dotenv').config();
 
 const server = express();
 server.use(express.json());
+server.use(cors());
 
 const mysqlConfig = {
   host: 'localhost',
@@ -16,7 +18,7 @@ const mysqlConfig = {
   database: 'sharebill',
 };
 const userSchema = joi.object({
-  full_name: joi.string().required(),
+  full_name: joi.string().trim().required(),
   email: joi.string().email().trim().lowercase().required(),
   password: joi.string().required(),
 });
@@ -93,13 +95,20 @@ server.post('/register', async (req, res) => {
     // Encrypt the password
     const encryptedPassword = await bcrypt.hash(payload.password, 10);
     // Insert the user into the database
-    await dbPool.execute(
+    const [response] = await dbPool.execute(
       `INSERT INTO users (full_name, email, password, created_at)
       VALUES (?, ?, ?, ?)`,
       [payload.full_name, payload.email, encryptedPassword, new Date()]
     );
-
-    res.status(201).end();
+    const token = jwt.sign(
+      {
+        email: payload.email,
+        id: response.insertId,
+        full_name: payload.full_name,
+      },
+      'abc123'
+    );
+    res.status(201).json({ token });
   } catch (err) {
     console.error(err);
     res.status(500).end();
