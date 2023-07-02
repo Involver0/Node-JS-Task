@@ -114,5 +114,38 @@ server.post('/register', async (req, res) => {
     res.status(500).end();
   }
 });
+server.get('/home', authenticate, async (_, res) => {
+  try {
+    const [groups] = await dbPool.execute('Select * FROM sharebill.groups');
+    return res.json(groups);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).end();
+  }
+});
+
+server.post('/creategroup', authenticate, async (req, res) => {
+  try {
+    if (!req.body.name) {
+      return res.status(400).json({
+        status: 400,
+        error: 'You must provide a group name',
+      });
+    }
+
+    const payload = {
+      name: req.body.name, // Extract the name from req.body
+    };
+
+    const response = await dbPool.query(
+      'INSERT INTO sharebill.groups SET ?',
+      payload
+    );
+    res.status(201).json(response);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).end();
+  }
+});
 
 server.listen(8080, () => console.log('Server is listening to 8080 port'));

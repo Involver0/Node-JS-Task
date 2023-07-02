@@ -101,18 +101,31 @@ main .login-card .span-container {
 
 .container {
   padding: 3rem;
+  text-align: center;
 }
 .container h1 {
   margin-bottom: 1rem;
 }
 
-.tweet {
+.group {
+  margin: 1rem;
   padding: 1rem 2rem;
   box-shadow: rgba(0, 0, 0, 0.05) 0px 6px 24px 0px,
     rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
   margin-bottom: 1rem;
+  text-align: center;
+  width: 120px;
+  border-radius: 0.5rem;
 }
 
-.tweet h4 {
+.group h4 {
   margin-bottom: 0.5rem;
+}
+
+#output {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
 }
