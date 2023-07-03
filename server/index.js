@@ -2,10 +2,16 @@ const express = require('express');
 const mysql = require('mysql2');
 const joi = require('joi');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const cors = require('cors');
+const { authenticate } = require('./middleware');
 require('dotenv').config();
 
 const server = express();
 server.use(express.json());
+server.use(cors());
+
+/////////////////////////////// Config ////////////////////////////
 
 const mysqlConfig = {
   host: 'localhost',
@@ -13,8 +19,11 @@ const mysqlConfig = {
   password: 'admin',
   database: 'sharebill',
 };
+
+/////////////////////////////// Schemas ////////////////////////////
+
 const userSchema = joi.object({
-  full_name: joi.string().required(),
+  full_name: joi.string().trim().required(),
   email: joi.string().email().trim().lowercase().required(),
   password: joi.string().required(),
 });
@@ -26,9 +35,14 @@ const userLoginSchema = joi.object({
 
 const dbPool = mysql.createPool(mysqlConfig).promise();
 
-server.get('/', (_, res) => {
-  res.status(200).end();
+/////////////////////////////// / ////////////////////////////
+
+server.get('/', authenticate, (req, res) => {
+  console.log(req.user);
+  res.status(200).send({ message: 'Authorized' });
 });
+
+/////////////////////////////// Login ////////////////////////////
 
 server.post('/login', async (req, res) => {
   let payload = req.body;
@@ -52,23 +66,25 @@ server.post('/login', async (req, res) => {
     );
 
     if (isPasswordMatching) {
-      return res.status(200).end();
+      const token = jwt.sign(
+        {
+          email: data[0].email,
+          id: data[0].id,
+        },
+        'abc123'
+      );
+      return res.status(200).send({ token });
     }
 
     return res.status(400).send({ error: 'Email or password did not match' });
   } catch (err) {
     console.error(err);
-    return res.status(500).send({ error: 'Belekas' });
+    return res.status(500).send({ error: 'Server Error' });
   }
 });
 
-// {
-//   "full_name": "Regelis",
-//   "email": "regelis@domain.com",
-//   "password": "123"
-// }
+/////////////////////////////// Home ////////////////////////////
 
-// Register
 server.post('/register', async (req, res) => {
   let payload = req.body;
   // Schema
@@ -83,16 +99,59 @@ server.post('/register', async (req, res) => {
     // Encrypt the password
     const encryptedPassword = await bcrypt.hash(payload.password, 10);
     // Insert the user into the database
-    await dbPool.execute(
+    const [response] = await dbPool.execute(
       `INSERT INTO users (full_name, email, password, created_at)
       VALUES (?, ?, ?, ?)`,
       [payload.full_name, payload.email, encryptedPassword, new Date()]
     );
-
-    res.status(201).end();
+    const token = jwt.sign(
+      {
+        email: payload.email,
+        id: response.insertId,
+        full_name: payload.full_name,
+      },
+      'abc123'
+    );
+    res.status(201).json({ token });
   } catch (err) {
     console.error(err);
     res.status(500).end();
+  }
+});
+
+/////////////////////////////// Home ////////////////////////////
+
+server.get('/home', authenticate, async (_, res) => {
+  try {
+    const [groups] = await dbPool.execute('Select * FROM sharebill.groups');
+    return res.json(groups);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).end();
+  }
+});
+
+server.post('/creategroup', authenticate, async (req, res) => {
+  try {
+    if (!req.body.name) {
+      return res.status(400).json({
+        status: 400,
+        error: 'You must provide a group name',
+      });
+    }
+
+    const payload = {
+      name: req.body.name, // Extract the name from req.body
+    };
+
+    const response = await dbPool.query(
+      'INSERT INTO sharebill.groups SET ?',
+      payload
+    );
+    res.status(201).json(response);
+  } catch (err) {
+    console.log(err);
+    return res.status(500).end();
   }
 });
 
