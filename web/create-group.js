@@ -27,7 +27,7 @@ form.addEventListener('submit', async (event) => {
 
   const userData = await createGroup(payload);
 
-  if (userData && userData.error) {
+  if (userData.error) {
     window.location.replace('./login.html');
   }
 });

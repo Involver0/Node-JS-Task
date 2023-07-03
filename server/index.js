@@ -11,12 +11,17 @@ const server = express();
 server.use(express.json());
 server.use(cors());
 
+/////////////////////////////// Config ////////////////////////////
+
 const mysqlConfig = {
   host: 'localhost',
   user: 'root',
   password: 'admin',
   database: 'sharebill',
 };
+
+/////////////////////////////// Schemas ////////////////////////////
+
 const userSchema = joi.object({
   full_name: joi.string().trim().required(),
   email: joi.string().email().trim().lowercase().required(),
@@ -30,10 +35,14 @@ const userLoginSchema = joi.object({
 
 const dbPool = mysql.createPool(mysqlConfig).promise();
 
+/////////////////////////////// / ////////////////////////////
+
 server.get('/', authenticate, (req, res) => {
   console.log(req.user);
   res.status(200).send({ message: 'Authorized' });
 });
+
+/////////////////////////////// Login ////////////////////////////
 
 server.post('/login', async (req, res) => {
   let payload = req.body;
@@ -70,17 +79,12 @@ server.post('/login', async (req, res) => {
     return res.status(400).send({ error: 'Email or password did not match' });
   } catch (err) {
     console.error(err);
-    return res.status(500).send({ error: 'Belekas' });
+    return res.status(500).send({ error: 'Server Error' });
   }
 });
 
-// {
-//   "full_name": "Regelis",
-//   "email": "regelis@domain.com",
-//   "password": "123"
-// }
+/////////////////////////////// Home ////////////////////////////
 
-// Register
 server.post('/register', async (req, res) => {
   let payload = req.body;
   // Schema
@@ -114,6 +118,9 @@ server.post('/register', async (req, res) => {
     res.status(500).end();
   }
 });
+
+/////////////////////////////// Home ////////////////////////////
+
 server.get('/home', authenticate, async (_, res) => {
   try {
     const [groups] = await dbPool.execute('Select * FROM sharebill.groups');

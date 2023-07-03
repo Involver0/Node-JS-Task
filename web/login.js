@@ -28,7 +28,7 @@ form.addEventListener('submit', async (event) => {
 
   const userData = await userLogin(payload);
   if (userData.token) {
-    Cookies.set('token', userData.token, { expires: 0.1 });
+    Cookies.set('token', userData.token);
     window.location.replace('./home.html');
   }
 });

@@ -129,3 +129,25 @@ main .login-card .span-container {
   align-items: center;
   flex-wrap: wrap;
 }
+
+#group-form {
+  margin-top: 2rem;
+}
+
+#post-button {
+  margin-top: 32px;
+  padding: 8px 8px;
+  border-radius: 25px;
+  cursor: pointer;
+  border: none;
+  background: -webkit-linear-gradient(left, #526b69, #e7cbc2);
+  color: white;
+  font-size: 15px;
+  font-weight: bold;
+  transition-delay: 1s;
+  transition-property: background;
+}
+
+#post-button:hover {
+  background: -webkit-linear-gradient(left, #e7cbc2, #526b69);
+}
